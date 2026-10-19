@@ -1,0 +1,39 @@
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+}
+.field label {
+  font-weight: 600;
+}
+.field input,
+.field select {
+  padding: 0.55rem 0.7rem;
+  border: 1px solid #d9dfda;
+  border-radius: 8px;
+  font: inherit;
+}
+.btn {
+  padding: 0.55rem 1.1rem;
+  border: 0;
+  border-radius: 8px;
+  background: #2f6b4f;
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.error {
+  color: #b3402f;
+}
+.success {
+  color: #1f5c3f;
+}
