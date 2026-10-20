@@ -34,6 +34,9 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private AccountProfile profile;
 
+    @Column(name = "rejection_reason")
+    private String rejectionReason;
+
     public Long getId() { return id; }
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
@@ -48,4 +51,6 @@ public class User {
     public LocalDateTime getCreatedAt() { return createdAt; }
     public AccountProfile getProfile() { return profile; }
     public void setProfile(AccountProfile profile) { this.profile = profile; }
+    public String getRejectionReason() { return rejectionReason; }
+    public void setRejectionReason(String rejectionReason) { this.rejectionReason = rejectionReason; }
 }
