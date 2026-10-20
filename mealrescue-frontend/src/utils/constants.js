@@ -7,10 +7,10 @@ export const ROLES = {
 
 // Where each role goes after logging in
 export const HOME_BY_ROLE = {
-  CUSTOMER: '/listings',
-  ORGANIZATION: '/listings',
-  BUSINESS: '/business',
-  ADMIN: '/admin',
+  CUSTOMER: '/',
+  ORGANIZATION: '/',
+  BUSINESS: '/',
+  ADMIN: '/',
 }
 
 // Keys used to save the login in the browser's localStorage

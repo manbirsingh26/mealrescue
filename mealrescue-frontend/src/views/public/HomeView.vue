@@ -6,7 +6,7 @@ const auth = useAuthStore()
 
 <template>
   <h1>MealRescue</h1>
-  <p>Frontend is working.</p>
   <p>Logged in: {{ auth.isAuthenticated }}</p>
-  <p>Home route: {{ auth.homeRoute }}</p>
+  <p v-if="auth.isAuthenticated">{{ auth.user.name }} ({{ auth.role }})</p>
+  <button v-if="auth.isAuthenticated" @click="auth.logout()">Log out</button>
 </template>

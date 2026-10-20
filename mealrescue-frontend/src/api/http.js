@@ -29,7 +29,8 @@ http.interceptors.response.use(
 
 // Gets a readable error message from a failed request
 export function errorMessage(error, fallback = 'Something went wrong. Please try again.') {
-  return error?.response?.data?.message || fallback
+  if (!error?.response) return 'Cannot reach the server. Please try again later.'
+  return error.response.data?.message || fallback
 }
 
 export default http
