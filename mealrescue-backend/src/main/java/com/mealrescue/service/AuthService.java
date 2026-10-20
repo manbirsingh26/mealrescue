@@ -1,5 +1,9 @@
 package com.mealrescue.service;
 
+import com.mealrescue.dto.AuthResponse;
+import com.mealrescue.dto.LoginRequest;
+import com.mealrescue.dto.UserResponse;
+import com.mealrescue.security.JwtService;
 import com.mealrescue.dto.RegisterRequest;
 import com.mealrescue.exception.ApiException;
 import com.mealrescue.model.AccountProfile;
@@ -17,10 +21,12 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder,JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;    
     }
 
     @Transactional
@@ -55,5 +61,22 @@ public class AuthService {
         }
 
         return userRepository.save(user);
+    }
+        public AuthResponse login(LoginRequest request) {
+        String email = request.email().trim().toLowerCase();
+
+        // Same message for "no such email" and "wrong password", so nobody can probe which emails exist
+        User user = userRepository.findByEmail(email)
+                .filter(u -> passwordEncoder.matches(request.password(), u.getPasswordHash()))
+                .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "Email or password is incorrect."));
+
+        switch (user.getStatus()) {
+            case PENDING -> throw new ApiException(HttpStatus.FORBIDDEN, "Your account is waiting for admin verification.");
+            case REJECTED -> throw new ApiException(HttpStatus.FORBIDDEN, "Your account request was not approved.");
+            case DEACTIVATED -> throw new ApiException(HttpStatus.FORBIDDEN, "This account has been deactivated.");
+            default -> { }
+        }
+
+        return new AuthResponse(jwtService.generateToken(user), UserResponse.from(user));
     }
 }

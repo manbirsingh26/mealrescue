@@ -1,5 +1,7 @@
 package com.mealrescue.controller;
 
+import com.mealrescue.dto.AuthResponse;
+import com.mealrescue.dto.LoginRequest;
 import com.mealrescue.dto.RegisterRequest;
 import com.mealrescue.dto.UserResponse;
 import com.mealrescue.service.AuthService;
@@ -25,5 +27,9 @@ public class AuthController {
     public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterRequest request) {
         UserResponse response = UserResponse.from(authService.register(request));
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+        @PostMapping("/login")
+    public AuthResponse login(@Valid @RequestBody LoginRequest request) {
+        return authService.login(request);
     }
 }
