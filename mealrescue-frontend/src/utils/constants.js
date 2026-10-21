@@ -10,7 +10,7 @@ export const HOME_BY_ROLE = {
   CUSTOMER: '/',
   ORGANIZATION: '/',
   BUSINESS: '/',
-  ADMIN: '/',
+  ADMIN: '/admin',
 }
 
 // Keys used to save the login in the browser's localStorage
