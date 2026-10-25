@@ -25,6 +25,16 @@ const routes = [
       { path: 'verification', name: 'admin-verification', component: () => import('@/views/admin/VerificationQueueView.vue') },
     ],
   },
+    {
+    path: '/business',
+    component: DashboardLayout,
+    meta: { requiresAuth: true, roles: [ROLES.BUSINESS] },
+    children: [
+      { path: '', redirect: { name: 'business-listings' } },
+      { path: 'listings', name: 'business-listings', component: () => import('@/views/business/MyListingsView.vue') },
+      { path: 'listings/new', name: 'business-listing-new', component: () => import('@/views/business/ListingEditView.vue') },
+    ],
+  },
   { path: '/:pathMatch(.*)*', name: 'not-found', component: () => import('@/views/public/NotFoundView.vue') },
 ]
 

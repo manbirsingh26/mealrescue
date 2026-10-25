@@ -5,11 +5,21 @@ export const ROLES = {
   ADMIN: 'ADMIN',
 }
 
+export const FOOD_CATEGORIES = [
+  { value: 'BAKERY', label: 'Bakery' },
+  { value: 'PREPARED_MEALS', label: 'Prepared meals' },
+  { value: 'PRODUCE', label: 'Produce' },
+  { value: 'DAIRY', label: 'Dairy' },
+  { value: 'GROCERIES', label: 'Groceries' },
+  { value: 'BEVERAGES', label: 'Beverages' },
+  { value: 'OTHER', label: 'Other' },
+]
+
 // Where each role goes after logging in
 export const HOME_BY_ROLE = {
   CUSTOMER: '/',
   ORGANIZATION: '/',
-  BUSINESS: '/',
+  BUSINESS: '/business',
   ADMIN: '/admin',
 }
 

@@ -1,9 +1,20 @@
 <script setup>
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { ROLES } from '@/utils/constants'
 
 const auth = useAuthStore()
 const router = useRouter()
+
+const links = computed(() =>
+  auth.role === ROLES.ADMIN
+    ? [{ to: '/admin/verification', label: 'Verification queue' }]
+    : [
+        { to: '/business/listings', label: 'My listings' },
+        { to: '/business/listings/new', label: 'New listing' },
+      ],
+)
 
 function logout() {
   auth.logout()
@@ -15,8 +26,10 @@ function logout() {
   <div class="dash">
     <aside class="side">
       <router-link to="/" class="brand">MealRescue</router-link>
-      <nav>
-        <router-link to="/admin/verification" active-class="active">Verification queue</router-link>
+            <nav>
+        <router-link v-for="l in links" :key="l.to" :to="l.to" exact-active-class="active">
+          {{ l.label }}
+        </router-link>
       </nav>
       <div class="side-foot">
         <span>{{ auth.user?.name }}</span>

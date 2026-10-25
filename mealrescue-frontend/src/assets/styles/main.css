@@ -37,3 +37,12 @@ body {
 .success {
   color: #1f5c3f;
 }
+
+.field input,
+.field select,
+.field textarea {
+  padding: 0.55rem 0.7rem;
+  border: 1px solid #d9dfda;
+  border-radius: 8px;
+  font: inherit;
+}
