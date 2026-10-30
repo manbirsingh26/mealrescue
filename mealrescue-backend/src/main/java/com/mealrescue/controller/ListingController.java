@@ -12,7 +12,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import java.util.List;
 
 @RestController
@@ -33,5 +34,21 @@ public class ListingController {
     @GetMapping("/api/business/listings")
     public List<ListingResponse> myListings(@AuthenticationPrincipal User business) {
         return listingService.getMyListings(business);
+    }
+
+        @GetMapping("/api/business/listings/{id}")
+    public ListingResponse myListing(@AuthenticationPrincipal User business, @PathVariable Long id) {
+        return listingService.getMyListing(business, id);
+    }
+
+    @PutMapping("/api/listings/{id}")
+    public ListingResponse update(@AuthenticationPrincipal User business, @PathVariable Long id,
+                                  @Valid @RequestBody CreateListingRequest request) {
+        return listingService.update(business, id, request);
+    }
+
+    @PostMapping("/api/listings/{id}/cancel")
+    public ListingResponse cancel(@AuthenticationPrincipal User business, @PathVariable Long id) {
+        return listingService.cancel(business, id);
     }
 }
