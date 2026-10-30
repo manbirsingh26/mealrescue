@@ -2,20 +2,26 @@
 import { reactive, ref } from 'vue'
 import { FOOD_CATEGORIES } from '@/utils/constants'
 
-defineProps({
+const props = defineProps({
+  initial: { type: Object, default: null },
+  submitLabel: { type: String, default: 'Create listing' },
   submitting: { type: Boolean, default: false },
   serverError: { type: String, default: '' },
 })
 const emit = defineEmits(['save'])
 
+// "2026-12-01T17:00:00" -> "2026-12-01T17:00", the format <input type="datetime-local"> needs
+const toInput = (iso) => (iso ? iso.slice(0, 16) : '')
+
+// When editing, start with the existing listing's values
 const form = reactive({
-  title: '',
-  description: '',
-  category: '',
-  quantity: null,
-  price: null,
-  pickupStart: '',
-  pickupEnd: '',
+  title: props.initial?.title ?? '',
+  description: props.initial?.description ?? '',
+  category: props.initial?.category ?? '',
+  quantity: props.initial?.quantityTotal ?? null,
+  price: props.initial?.price ?? null,
+  pickupStart: toInput(props.initial?.pickupStart),
+  pickupEnd: toInput(props.initial?.pickupEnd),
 })
 const error = ref('')
 
@@ -87,7 +93,7 @@ function save() {
     </div>
 
     <p v-if="error || serverError" class="error" role="alert">{{ error || serverError }}</p>
-    <button class="btn" :disabled="submitting">{{ submitting ? 'Saving...' : 'Create listing' }}</button>
+      <button class="btn" :disabled="submitting">{{ submitting ? 'Saving...' : submitLabel }}</button>
   </form>
 </template>
 

@@ -46,3 +46,16 @@ body {
   border-radius: 8px;
   font: inherit;
 }
+
+a.btn {
+  display: inline-block;
+  text-decoration: none;
+}
+.btn-light {
+  background: #fff;
+  color: #1d2521;
+  border: 1px solid #d9dfda;
+}
+.btn-danger {
+  background: #b3402f;
+}
