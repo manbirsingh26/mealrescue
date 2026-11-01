@@ -4,10 +4,19 @@ import { ROLES } from '@/utils/constants'
 import HomeView from '@/views/public/HomeView.vue'
 import AuthLayout from '@/layouts/AuthLayout.vue'
 import DashboardLayout from '@/layouts/DashboardLayout.vue'
+import DefaultLayout from '@/layouts/DefaultLayout.vue'
 
 const routes = [
   { path: '/', name: 'home', component: HomeView },
   { path: '/forbidden', name: 'forbidden', component: () => import('@/views/public/ForbiddenView.vue') },
+  {
+    path: '/',
+    component: DefaultLayout,
+    children: [
+      { path: 'listings', name: 'listings', component: () => import('@/views/customer/BrowseListingsView.vue') },
+      { path: 'listings/:id', name: 'listing-details', component: () => import('@/views/customer/ListingDetailsView.vue'), props: true },
+    ],
+  },
   {
     path: '/',
     component: AuthLayout,

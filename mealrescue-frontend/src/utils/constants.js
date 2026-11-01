@@ -17,8 +17,8 @@ export const FOOD_CATEGORIES = [
 
 // Where each role goes after logging in
 export const HOME_BY_ROLE = {
-  CUSTOMER: '/',
-  ORGANIZATION: '/',
+  CUSTOMER: '/listings',
+  ORGANIZATION: '/listings',
   BUSINESS: '/business',
   ADMIN: '/admin',
 }
