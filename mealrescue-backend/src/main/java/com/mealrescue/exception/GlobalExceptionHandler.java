@@ -6,6 +6,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.Map;
 
@@ -36,5 +37,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleConflict(ObjectOptimisticLockingFailureException ex) {
         return ResponseEntity.status(409)
                 .body(Map.of("message", "This record was just changed by someone else. Reload and try again."));
+    }
+
+        @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Map<String, String>> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        return ResponseEntity.badRequest()
+                .body(Map.of("message", "Invalid value for '" + ex.getName() + "'."));
     }
 }

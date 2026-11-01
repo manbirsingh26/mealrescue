@@ -16,6 +16,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import java.util.List;
 
+import com.mealrescue.dto.ListingDetailsResponse;
+import com.mealrescue.model.FoodCategory;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 @RestController
 public class ListingController {
 
@@ -50,5 +58,20 @@ public class ListingController {
     @PostMapping("/api/listings/{id}/cancel")
     public ListingResponse cancel(@AuthenticationPrincipal User business, @PathVariable Long id) {
         return listingService.cancel(business, id);
+    }
+
+    @GetMapping("/api/listings")
+    public List<ListingResponse> search(
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) FoodCategory category,
+            @RequestParam(required = false) BigDecimal maxPrice,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime pickupBefore,
+            @RequestParam(defaultValue = "ending") String sort) {
+        return listingService.search(q, category, maxPrice, pickupBefore, sort);
+    }
+
+    @GetMapping("/api/listings/{id}")
+    public ListingDetailsResponse details(@PathVariable Long id) {
+        return listingService.getPublicListing(id);
     }
 }

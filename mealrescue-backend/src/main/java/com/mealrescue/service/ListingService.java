@@ -14,6 +14,17 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.mealrescue.dto.ListingDetailsResponse;
+import com.mealrescue.model.AccountStatus;
+import com.mealrescue.model.FoodCategory;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Predicate;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+
 @Service
 public class ListingService {
 
@@ -100,6 +111,66 @@ public class ListingService {
         if (!request.pickupEnd().isAfter(LocalDateTime.now())) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Pickup end time must be in the future.");
         }
+    }
+
+        // US-10, US-11: public search with optional filters
+    @Transactional(readOnly = true)
+    public List<ListingResponse> search(String q, FoodCategory category, BigDecimal maxPrice,
+                                        LocalDateTime pickupBefore, String sort) {
+        LocalDateTime now = LocalDateTime.now();
+
+        Specification<Listing> spec = (root, query, cb) -> {
+            List<Predicate> conditions = new ArrayList<>();
+            Join<Listing, User> business = root.join("business");
+
+            // Always: only food that can still be reserved, from active businesses
+            conditions.add(cb.equal(root.get("status"), ListingStatus.ACTIVE));
+            conditions.add(cb.greaterThan(root.<Integer>get("quantityRemaining"), 0));
+            conditions.add(cb.greaterThan(root.<LocalDateTime>get("pickupEnd"), now));
+            conditions.add(cb.equal(business.get("status"), AccountStatus.ACTIVE));
+
+            // Optional filters: each one is added only if the customer used it
+            if (q != null && !q.isBlank()) {
+                String pattern = "%" + q.trim().toLowerCase() + "%";
+                conditions.add(cb.or(
+                        cb.like(cb.lower(root.<String>get("title")), pattern),
+                        cb.like(cb.lower(business.<String>get("name")), pattern)));
+            }
+            if (category != null) {
+                conditions.add(cb.equal(root.get("category"), category));
+            }
+            if (maxPrice != null) {
+                conditions.add(cb.lessThanOrEqualTo(root.<BigDecimal>get("price"), maxPrice));
+            }
+            if (pickupBefore != null) {
+                conditions.add(cb.lessThanOrEqualTo(root.<LocalDateTime>get("pickupStart"), pickupBefore));
+            }
+
+            return cb.and(conditions.toArray(new Predicate[0]));
+        };
+
+        return listingRepository.findAll(spec, sortFor(sort)).stream()
+                .map(ListingResponse::from)
+                .toList();
+    }
+
+    // US-12: one listing for the public details page
+    @Transactional(readOnly = true)
+    public ListingDetailsResponse getPublicListing(Long id) {
+        Listing listing = listingRepository.findById(id)
+                .filter(l -> l.getBusiness().getStatus() == AccountStatus.ACTIVE)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Listing not found."));
+        return ListingDetailsResponse.from(listing);
+    }
+
+    private Sort sortFor(String sort) {
+        if ("price".equals(sort)) {
+            return Sort.by("price").ascending().and(Sort.by("pickupEnd").ascending());
+        }
+        if ("newest".equals(sort)) {
+            return Sort.by("createdAt").descending();
+        }
+        return Sort.by("pickupEnd").ascending(); // default: ending soonest first
     }
 
     // Fields that are the same for create and update
