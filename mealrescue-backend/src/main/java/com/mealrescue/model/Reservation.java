@@ -36,6 +36,9 @@ public class Reservation {
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Column(nullable = true)
+    private LocalDateTime pickedUpAt; // null until the business confirms pickup
+
     public Long getId() {
         return id;
     }
@@ -98,6 +101,14 @@ public class Reservation {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getPickedUpAt() {
+        return pickedUpAt;
+    }
+
+    public void setPickedUpAt(LocalDateTime pickedUpAt) {
+        this.pickedUpAt = pickedUpAt;
     }
 
     // getters and setters for every field, same style as Listing

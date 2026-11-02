@@ -1,5 +1,7 @@
 package com.mealrescue.controller;
 
+import com.mealrescue.dto.BusinessReservationResponse;
+import com.mealrescue.dto.ConfirmPickupRequest;
 import com.mealrescue.dto.CreateReservationRequest;
 import com.mealrescue.dto.ReservationResponse;
 import com.mealrescue.model.User;
@@ -41,5 +43,16 @@ public class ReservationController {
     @PostMapping("/api/reservations/{id}/cancel")
     public ReservationResponse cancel(@AuthenticationPrincipal User customer, @PathVariable Long id) {
         return reservationService.cancel(customer.getId(), id);
+    }
+
+        @GetMapping("/api/business/reservations")
+    public List<BusinessReservationResponse> businessReservations(@AuthenticationPrincipal User business) {
+        return reservationService.businessReservations(business.getId());
+    }
+
+    @PostMapping("/api/business/reservations/confirm")
+    public BusinessReservationResponse confirmPickup(@AuthenticationPrincipal User business,
+                                                     @Valid @RequestBody ConfirmPickupRequest request) {
+        return reservationService.confirmPickup(business.getId(), request.code());
     }
 }

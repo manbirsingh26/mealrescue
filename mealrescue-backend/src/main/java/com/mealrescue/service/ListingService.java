@@ -5,8 +5,10 @@ import com.mealrescue.dto.ListingResponse;
 import com.mealrescue.exception.ApiException;
 import com.mealrescue.model.Listing;
 import com.mealrescue.model.ListingStatus;
+import com.mealrescue.model.ReservationStatus;
 import com.mealrescue.model.User;
 import com.mealrescue.repository.ListingRepository;
+import com.mealrescue.repository.ReservationRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,10 +31,14 @@ import java.util.ArrayList;
 public class ListingService {
 
     private final ListingRepository listingRepository;
-
-    public ListingService(ListingRepository listingRepository) {
+   private final ReservationRepository reservationRepository;
+    
+   public ListingService(ListingRepository listingRepository, ReservationRepository reservationRepository) {
         this.listingRepository = listingRepository;
+        this.reservationRepository = reservationRepository;
     }
+
+    
 
     @Transactional
     public ListingResponse create(User business, CreateListingRequest request) {
@@ -91,6 +97,8 @@ public class ListingService {
             throw new ApiException(HttpStatus.CONFLICT, "This listing can no longer be cancelled.");
         }
         listing.setStatus(ListingStatus.CANCELLED);
+        reservationRepository.findByListingIdAndStatus(listing.getId(), ReservationStatus.RESERVED)
+                .forEach(r -> r.setStatus(ReservationStatus.CANCELLED));
         // Later, when reservations exist, this is also where we cancel the listing's active reservations
         return ListingResponse.from(listing);
     }
