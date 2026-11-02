@@ -82,11 +82,11 @@ async function confirmCancel() {
           <td>{{ formatPrice(l.price) }}</td>
           <td>{{ formatDateTime(l.pickupStart) }} to {{ formatDateTime(l.pickupEnd) }}</td>
           <td><StatusBadge :status="l.status" /></td>
-          <td class="actions">
-            <template v-if="canChange(l)">
+          <td >
+            <div v-if="canChange(l)" class="actions">
               <router-link :to="`/business/listings/${l.id}/edit`" class="btn btn-light">Edit</router-link>
               <button class="btn btn-danger" @click="cancelTarget = l">Cancel</button>
-            </template>
+            </div>
           </td>
         </tr>
       </tbody>
@@ -120,6 +120,7 @@ th,
 td {
   text-align: left;
   padding: 0.6rem 0.75rem;
+  vertical-align: middle;
   border-bottom: 1px solid #d9dfda;
 }
 .actions {

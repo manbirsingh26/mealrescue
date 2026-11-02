@@ -1,26 +1,74 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { getListing } from '@/api/listings.api'
+import { createReservation } from '@/api/reservations.api'
 import { errorMessage } from '@/api/http'
+import { useAuthStore } from '@/stores/auth'
 import StatusBadge from '@/components/common/StatusBadge.vue'
 import { categoryLabel, formatDateTime, formatPrice } from '@/utils/formatters'
 
 const props = defineProps({ id: { type: String, required: true } })
+const auth = useAuthStore()
 
 const data = ref(null)
 const loading = ref(true)
 const error = ref('')
 
-onMounted(async () => {
+const quantity = ref(1)
+const reserving = ref(false)
+const reserveError = ref('')
+const confirmation = ref(null) // the reservation the server just created
+
+const canReserve = computed(() => ['CUSTOMER', 'ORGANIZATION'].includes(auth.role))
+
+// display only; the server calculates the real total
+const total = computed(() => {
+  if (!data.value) return 0
+  const qty = Number(quantity.value) || 0
+  return Math.round(data.value.listing.price * qty * 100) / 100
+})
+
+async function load(quiet = false) {
   try {
     const response = await getListing(props.id)
     data.value = response.data
   } catch (e) {
-    error.value = errorMessage(e, 'Could not load this listing.')
+    if (!quiet) error.value = errorMessage(e, 'Could not load this listing.')
   } finally {
     loading.value = false
   }
-})
+}
+
+onMounted(() => load())
+
+async function reserve() {
+  reserveError.value = ''
+  const qty = Number(quantity.value)
+  const left = data.value.listing.quantityRemaining
+
+  if (!Number.isInteger(qty) || qty < 1) {
+    reserveError.value = 'Enter a whole number of 1 or more.'
+    return
+  }
+  if (qty > left) {
+    reserveError.value = `Only ${left} left.`
+    return
+  }
+
+  reserving.value = true
+  try {
+    const { data: result } = await createReservation(data.value.listing.id, qty)
+    confirmation.value = result
+    quantity.value = 1
+    await load(true) // refresh the remaining quantity without losing the confirmation
+  } catch (e) {
+    reserveError.value = errorMessage(e, 'Could not reserve this food.')
+    // 409 means the listing changed (sold out, expired): show the fresh numbers
+    if (e.response?.status === 409) await load(true)
+  } finally {
+    reserving.value = false
+  }
+}
 </script>
 
 <template>
@@ -61,7 +109,45 @@ onMounted(async () => {
       </div>
     </dl>
 
-    <button class="btn" disabled>Reserve (coming next)</button>
+    <section v-if="confirmation" class="confirmation" role="status">
+      <h2>Reservation confirmed</h2>
+      <p>Show this code when you pick up your food:</p>
+      <p class="code">{{ confirmation.pickupCode }}</p>
+      <p>
+        {{ confirmation.quantity }} &times; {{ confirmation.listingTitle }}, total
+        {{ formatPrice(confirmation.totalPrice) }}
+      </p>
+      <p>
+        Pickup {{ formatDateTime(confirmation.pickupStart) }} to {{ formatDateTime(confirmation.pickupEnd) }}
+      </p>
+    </section>
+
+    <template v-if="data.available">
+      <form v-if="canReserve" class="reserve" @submit.prevent="reserve">
+        <div class="field">
+          <label for="qty">Quantity</label>
+          <input
+            id="qty"
+            v-model.number="quantity"
+            type="number"
+            min="1"
+            :max="data.listing.quantityRemaining"
+            step="1"
+          />
+        </div>
+        <p class="total">Total: {{ formatPrice(total) }}</p>
+        <p v-if="reserveError" class="error" role="alert">{{ reserveError }}</p>
+        <button class="btn" :disabled="reserving">{{ reserving ? 'Reserving...' : 'Reserve' }}</button>
+      </form>
+
+      <p v-else-if="auth.isAuthenticated" class="hint">
+        Only customers and organizations can reserve food.
+      </p>
+      <p v-else class="hint">
+        <router-link to="/login">Log in</router-link> or
+        <router-link to="/register">register</router-link> to reserve this food.
+      </p>
+    </template>
   </article>
 </template>
 
@@ -117,5 +203,36 @@ dd {
 .price {
   color: #7a5200;
   font-size: 1.25rem;
+}
+.confirmation {
+  background: #e4f1ea;
+  border: 1px solid #b9d9c7;
+  border-radius: 10px;
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+.confirmation h2 {
+  margin: 0 0 0.5rem;
+  color: #1f5c3f;
+}
+.confirmation p {
+  margin: 0.25rem 0;
+}
+.code {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.25rem;
+  color: #1f5c3f;
+}
+.reserve {
+  border-top: 1px solid #d9dfda;
+  padding-top: 1rem;
+  max-width: 260px;
+}
+.total {
+  font-weight: 600;
+}
+.hint {
+  color: #5d6a63;
 }
 </style>
