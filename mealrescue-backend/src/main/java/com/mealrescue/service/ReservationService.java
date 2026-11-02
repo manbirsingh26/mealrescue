@@ -3,6 +3,7 @@ package com.mealrescue.service;
 import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -14,12 +15,13 @@ import com.mealrescue.model.AccountStatus;
 import com.mealrescue.model.Listing;
 import com.mealrescue.model.ListingStatus;
 import com.mealrescue.model.Reservation;
+import com.mealrescue.model.ReservationStatus;
 import com.mealrescue.model.User;
 import com.mealrescue.repository.ListingRepository;
 import com.mealrescue.repository.ReservationRepository;
 import com.mealrescue.repository.UserRepository;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ReservationService {
@@ -75,5 +77,37 @@ public class ReservationService {
         reservation.setPickupCode(String.format("%06d", RANDOM.nextInt(1_000_000)));
 
         return ReservationResponse.from(reservationRepository.save(reservation));
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReservationResponse> myReservations(Long customerId) {
+        return reservationRepository.findByCustomerIdOrderByCreatedAtDesc(customerId)
+                .stream().map(ReservationResponse::from).toList();
+    }
+
+    @Transactional
+    public ReservationResponse cancel(Long customerId, Long reservationId) {
+        Reservation reservation = reservationRepository.findByIdAndCustomerId(reservationId, customerId)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Reservation not found."));
+
+        if (reservation.getStatus() != ReservationStatus.RESERVED) {
+            throw new ApiException(HttpStatus.CONFLICT, "Only active reservations can be cancelled.");
+        }
+
+        Listing listing = reservation.getListing();
+        LocalDateTime now = LocalDateTime.now();
+        if (!listing.getPickupEnd().isAfter(now)) {
+            throw new ApiException(HttpStatus.CONFLICT, "The pickup window has ended.");
+        }
+
+        reservation.setStatus(ReservationStatus.CANCELLED);
+
+        // give the portions back; @Version protects this update like in reserve()
+        listing.setQuantityRemaining(listing.getQuantityRemaining() + reservation.getQuantity());
+        if (listing.getStatus() == ListingStatus.SOLD_OUT) {
+            listing.setStatus(ListingStatus.ACTIVE);
+        }
+
+        return ReservationResponse.from(reservation);
     }
 }

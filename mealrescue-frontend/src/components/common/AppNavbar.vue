@@ -13,8 +13,12 @@ const router = useRouter()
 )*/
 
 const LINKS_BY_ROLE = {
-  CUSTOMER: [{ to: '/listings', label: 'Browse food' }],
-  ORGANIZATION: [{ to: '/listings', label: 'Browse food' }],
+  CUSTOMER: [{ to: '/listings', label: 'Browse food' },
+    { to: '/reservations', label: 'My reservations' },
+  ],
+  ORGANIZATION: [{ to: '/listings', label: 'Browse food' },
+    { to: '/reservations', label: 'My reservations' },
+  ],
   BUSINESS: [
     { to: '/business/listings', label: 'My listings' },
     { to: '/business/listings/new', label: 'New listing' },

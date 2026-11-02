@@ -120,6 +120,7 @@ async function reserve() {
       <p>
         Pickup {{ formatDateTime(confirmation.pickupStart) }} to {{ formatDateTime(confirmation.pickupEnd) }}
       </p>
+            <router-link to="/reservations">View my reservations</router-link>
     </section>
 
     <template v-if="data.available">

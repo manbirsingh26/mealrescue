@@ -13,6 +13,12 @@ const routes = [
     component: DefaultLayout,
     children: [
       { path: 'listings', name: 'listings', component: () => import('@/views/customer/BrowseListingsView.vue') },
+      {
+        path: 'reservations',
+        name: 'my-reservations',
+        component: () => import('@/views/customer/MyReservationsView.vue'),
+        meta: { requiresAuth: true, roles: ['CUSTOMER', 'ORGANIZATION'] },
+      },
       { path: 'listings/:id', name: 'listing-details', component: () => import('@/views/customer/ListingDetailsView.vue'), props: true },
     ],
   },
