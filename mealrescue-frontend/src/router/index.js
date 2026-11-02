@@ -3,7 +3,6 @@ import { useAuthStore } from '@/stores/auth'
 import { ROLES } from '@/utils/constants'
 import HomeView from '@/views/public/HomeView.vue'
 import AuthLayout from '@/layouts/AuthLayout.vue'
-import DashboardLayout from '@/layouts/DashboardLayout.vue'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 
 const routes = [
@@ -27,7 +26,7 @@ const routes = [
   },
   {
     path: '/admin',
-    component: DashboardLayout,
+    component: DefaultLayout,
     meta: { requiresAuth: true, roles: [ROLES.ADMIN] },
     children: [
       { path: '', redirect: { name: 'admin-verification' } },
@@ -36,7 +35,7 @@ const routes = [
   },
     {
     path: '/business',
-    component: DashboardLayout,
+    component: DefaultLayout,
     meta: { requiresAuth: true, roles: [ROLES.BUSINESS] },
     children: [
       { path: '', redirect: { name: 'business-listings' } },

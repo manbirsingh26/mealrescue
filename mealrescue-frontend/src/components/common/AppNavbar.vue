@@ -8,8 +8,24 @@ const auth = useAuthStore()
 const router = useRouter()
 
 // Businesses and admins have their own area; customers just use Browse food
-const areaLink = computed(() =>
+/*const areaLink = computed(() =>
   ['BUSINESS', 'ADMIN'].includes(auth.role) ? auth.homeRoute : null,
+)*/
+
+const LINKS_BY_ROLE = {
+  CUSTOMER: [{ to: '/listings', label: 'Browse food' }],
+  ORGANIZATION: [{ to: '/listings', label: 'Browse food' }],
+  BUSINESS: [
+    { to: '/business/listings', label: 'My listings' },
+    { to: '/business/listings/new', label: 'New listing' },
+  ],
+  ADMIN: [{ to: '/admin/verification', label: 'Verification queue' }],
+}
+
+const links = computed(() =>
+  auth.isAuthenticated
+    ? LINKS_BY_ROLE[auth.role] || []
+    : [{ to: '/listings', label: 'Browse food' }],
 )
 
 function logout() {
@@ -24,8 +40,7 @@ function logout() {
       <router-link to="/" aria-label="MealRescue home"><AppLogo /></router-link>
 
       <nav class="links" aria-label="Main">
-        <router-link to="/listings">Browse food</router-link>
-        <router-link v-if="areaLink" :to="areaLink">My area</router-link>
+        <router-link v-for="l in links" :key="l.to" :to="l.to">{{ l.label }}</router-link>
       </nav>
 
       <div class="actions">
@@ -66,7 +81,7 @@ function logout() {
   text-decoration: none;
   color: #1d2521;
 }
-.links a.router-link-active {
+.links a.router-link-exact-active {
   color: #2f6b4f;
   font-weight: 600;
 }
