@@ -8,6 +8,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.mealrescue.dto.BusinessReservationResponse;
 import com.mealrescue.dto.CreateReservationRequest;
 import com.mealrescue.dto.ReservationResponse;
 import com.mealrescue.exception.ApiException;
@@ -74,8 +75,11 @@ public class ReservationService {
         reservation.setCustomer(customer);
         reservation.setQuantity(request.quantity());
         reservation.setTotalPrice(listing.getPrice().multiply(BigDecimal.valueOf(request.quantity())));
-        reservation.setPickupCode(String.format("%06d", RANDOM.nextInt(1_000_000)));
-
+        String code;
+        do {
+            code = String.format("%06d", RANDOM.nextInt(1_000_000));
+        } while (reservationRepository.existsByPickupCodeAndStatus(code, ReservationStatus.RESERVED));
+        reservation.setPickupCode(code);
         return ReservationResponse.from(reservationRepository.save(reservation));
     }
 
@@ -109,5 +113,31 @@ public class ReservationService {
         }
 
         return ReservationResponse.from(reservation);
+    }
+
+    @Transactional(readOnly = true)
+    public List<BusinessReservationResponse> businessReservations(Long businessId) {
+        return reservationRepository.findByListingBusinessIdOrderByCreatedAtDesc(businessId)
+                .stream().map(BusinessReservationResponse::from).toList();
+    }
+
+    @Transactional
+    public BusinessReservationResponse confirmPickup(Long businessId, String code) {
+        Reservation reservation = reservationRepository
+                .findFirstByPickupCodeAndStatusAndListingBusinessId(code.trim(), ReservationStatus.RESERVED, businessId)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "No active reservation matches this code."));
+
+        Listing listing = reservation.getListing();
+        LocalDateTime now = LocalDateTime.now();
+        if (now.isBefore(listing.getPickupStart())) {
+            throw new ApiException(HttpStatus.CONFLICT, "The pickup window hasn't started yet.");
+        }
+        if (!listing.getPickupEnd().isAfter(now)) {
+            throw new ApiException(HttpStatus.CONFLICT, "The pickup window has ended.");
+        }
+
+        reservation.setStatus(ReservationStatus.PICKED_UP);
+        reservation.setPickedUpAt(now);
+        return BusinessReservationResponse.from(reservation);
     }
 }
