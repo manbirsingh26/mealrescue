@@ -13,6 +13,7 @@ const routes = [
     component: DefaultLayout,
     children: [
       { path: 'listings', name: 'listings', component: () => import('@/views/customer/BrowseListingsView.vue') },
+      { path: 'contact', name: 'contact', component: () => import('@/views/public/ContactView.vue') },
       {
         path: 'reservations',
         name: 'my-reservations',

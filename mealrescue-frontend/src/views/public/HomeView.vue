@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue'
-import AppLogo from '@/components/common/AppLogo.vue'
 import { useAuthStore } from '@/stores/auth'
+import AppNavbar from '@/components/common/AppNavbar.vue'
 
 const auth = useAuthStore()
 
@@ -46,22 +46,7 @@ const audiences = [
 
 <template>
   <div class="page">
-    <header class="top">
-      <div class="container bar">
-        <router-link to="/" class="brand" aria-label="MealRescue home"><AppLogo /></router-link>
-        <nav class="actions" aria-label="Account">
-          <template v-if="auth.isAuthenticated">
-            <span class="who">{{ auth.user.name }}</span>
-            <router-link v-if="areaLink" :to="areaLink" class="btn">Go to my area</router-link>
-            <button class="btn btn-light" @click="auth.logout()">Log out</button>
-          </template>
-          <template v-else>
-            <router-link to="/login" class="btn btn-light">Log in</router-link>
-            <router-link to="/register" class="btn">Register</router-link>
-          </template>
-        </nav>
-      </div>
-    </header>
+    <AppNavbar />
 
     <main>
       <section class="hero">
@@ -153,35 +138,6 @@ const audiences = [
   max-width: 1100px;
   margin: 0 auto;
   padding: 0 1rem;
-}
-
-/* ---------- top bar ---------- */
-.top {
-  background: #fff;
-  border-bottom: 1px solid #d9dfda;
-}
-.bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.5rem 1rem;
-  min-height: 68px;
-}
-.brand {
-  text-decoration: none;
-}
-.actions {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-}
-.actions .btn {
-  white-space: nowrap;
-}
-.who {
-  color: #5d6a63;
-  margin-right: 0.25rem;
 }
 
 /* ---------- hero ---------- */

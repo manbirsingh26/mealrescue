@@ -7,18 +7,12 @@ import AppLogo from '@/components/common/AppLogo.vue'
 const auth = useAuthStore()
 const router = useRouter()
 
-// Businesses and admins have their own area; customers just use Browse food
-/*const areaLink = computed(() =>
-  ['BUSINESS', 'ADMIN'].includes(auth.role) ? auth.homeRoute : null,
-)*/
+const LISTINGS = { to: '/listings', label: 'Current listings' }
+const CONTACT = { to: '/contact', label: 'Contact us' }
 
 const LINKS_BY_ROLE = {
-  CUSTOMER: [{ to: '/listings', label: 'Browse food' },
-    { to: '/reservations', label: 'My reservations' },
-  ],
-  ORGANIZATION: [{ to: '/listings', label: 'Browse food' },
-    { to: '/reservations', label: 'My reservations' },
-  ],
+  CUSTOMER: [LISTINGS, { to: '/reservations', label: 'My reservations' }],
+  ORGANIZATION: [LISTINGS, { to: '/reservations', label: 'My reservations' }],
   BUSINESS: [
     { to: '/business/listings', label: 'My listings' },
     { to: '/business/listings/new', label: 'New listing' },
@@ -27,11 +21,11 @@ const LINKS_BY_ROLE = {
   ADMIN: [{ to: '/admin/verification', label: 'Verification queue' }],
 }
 
-const links = computed(() =>
-  auth.isAuthenticated
-    ? LINKS_BY_ROLE[auth.role] || []
-    : [{ to: '/listings', label: 'Browse food' }],
-)
+// Same links on every page; Contact us is always last
+const links = computed(() => {
+  const own = auth.isAuthenticated ? LINKS_BY_ROLE[auth.role] || [] : [LISTINGS]
+  return [...own, CONTACT]
+})
 
 function logout() {
   auth.logout()
@@ -45,7 +39,10 @@ function logout() {
       <router-link to="/" aria-label="MealRescue home"><AppLogo /></router-link>
 
       <nav class="links" aria-label="Main">
-        <router-link v-for="l in links" :key="l.to" :to="l.to">{{ l.label }}</router-link>
+        <template v-for="(l, i) in links" :key="l.to">
+          <span v-if="i > 0" class="sep" aria-hidden="true">|</span>
+          <router-link :to="l.to">{{ l.label }}</router-link>
+        </template>
       </nav>
 
       <div class="actions">
@@ -79,16 +76,29 @@ function logout() {
 }
 .links {
   display: flex;
-  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
   flex: 1;
 }
 .links a {
-  text-decoration: none;
   color: #1d2521;
+  text-decoration: none;
+  font-weight: 600;
+  white-space: nowrap;
 }
+.links a:hover {
+  color: #2f6b4f;
+}
+/* the page you're on */
 .links a.router-link-exact-active {
   color: #2f6b4f;
-  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 6px;
+}
+.sep {
+  color: #b6c0ba;
 }
 .actions {
   display: flex;
