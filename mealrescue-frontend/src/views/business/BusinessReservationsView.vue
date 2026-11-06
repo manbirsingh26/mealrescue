@@ -21,6 +21,7 @@ const FILTERS = [
   { value: 'RESERVED', label: 'Waiting for pickup' },
   { value: 'PICKED_UP', label: 'Picked up' },
   { value: 'CANCELLED', label: 'Cancelled' },
+  { value: 'EXPIRED', label: 'Not collected' },
   { value: 'ALL', label: 'All' },
 ]
 

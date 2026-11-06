@@ -1,5 +1,6 @@
 package com.mealrescue.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,4 +25,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     boolean existsByPickupCodeAndStatus(String pickupCode, ReservationStatus status);
 
     List<Reservation> findByListingIdAndStatus(Long listingId, ReservationStatus status);
+
+        List<Reservation> findByStatusAndListingPickupEndLessThanEqual(ReservationStatus status, LocalDateTime time);
 }
