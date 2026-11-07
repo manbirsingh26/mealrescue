@@ -15,6 +15,14 @@ export const FOOD_CATEGORIES = [
   { value: 'OTHER', label: 'Other' },
 ]
 
+export const REPORT_REASONS = [
+  { value: 'UNSAFE_FOOD', label: 'Unsafe or spoiled food' },
+  { value: 'WRONG_INFORMATION', label: 'Wrong or misleading information' },
+  { value: 'NOT_AVAILABLE_AT_PICKUP', label: 'Food was not available at pickup' },
+  { value: 'RUDE_OR_INAPPROPRIATE', label: 'Rude or inappropriate behaviour' },
+  { value: 'OTHER', label: 'Other' },
+]
+
 // Where each role goes after logging in
 export const HOME_BY_ROLE = {
   CUSTOMER: '/listings',

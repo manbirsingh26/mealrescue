@@ -70,7 +70,7 @@ public class ReviewService {
                 .stream().map(ReviewResponse::from).toList();
 
         Double average = reviews.isEmpty() ? null
-                : Math.round(reviews.stream().mapToInt(ReviewResponse::rating).average().orElse(0) * 10) / 10.0;
+                : Math.round(reviews.stream().mapToInt(r -> r.rating()).average().orElse(0) * 10) / 10.0;
 
         return new BusinessReviewsResponse(business.getId(), business.getName(), average, reviews.size(), reviews);
     }

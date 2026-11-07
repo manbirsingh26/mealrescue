@@ -8,6 +8,7 @@ import StatusBadge from '@/components/common/StatusBadge.vue'
 import { categoryLabel, formatDateTime, formatPrice } from '@/utils/formatters'
 import ReviewList from '@/components/reviews/ReviewList.vue'
 import { getBusinessReviews } from '@/api/reviews.api'
+import ReportDialog from '@/components/reports/ReportDialog.vue'
 
 const props = defineProps({ id: { type: String, required: true } })
 const auth = useAuthStore()
@@ -21,6 +22,9 @@ const reserving = ref(false)
 const reserveError = ref('')
 const confirmation = ref(null) // the reservation the server just created
 const reviews = ref(null)
+
+const reportTarget = ref(null)
+const reportNotice = ref('')
 
 const canReserve = computed(() => ['CUSTOMER', 'ORGANIZATION'].includes(auth.role))
 
@@ -81,6 +85,20 @@ async function reserve() {
   } finally {
     reserving.value = false
   }
+}
+
+function openReport(kind) {
+  reportNotice.value = ''
+  const l = data.value.listing
+  reportTarget.value =
+    kind === 'listing'
+      ? { listingId: l.id, title: 'Report this listing' }
+      : { businessId: l.businessId, title: `Report ${l.businessName}` }
+}
+
+function reportSent() {
+  reportTarget.value = null
+  reportNotice.value = 'Thanks. Your report was sent to an admin.'
 }
 </script>
 
@@ -162,10 +180,17 @@ async function reserve() {
         <router-link to="/register">register</router-link> to reserve this food.
       </p>
     </template>
+        <div v-if="canReserve" class="report-links">
+      <button type="button" class="link-btn" @click="openReport('listing')">Report this listing</button>
+      <span aria-hidden="true">|</span>
+      <button type="button" class="link-btn" @click="openReport('business')">Report this business</button>
+    </div>
+    <p v-if="reportNotice" class="success" role="status">{{ reportNotice }}</p>
   </article>
     <section v-if="reviews" class="details reviews-box">
     <h2>Reviews of {{ reviews.businessName }}</h2>
     <ReviewList :summary="reviews" />
+    <ReportDialog :target="reportTarget" @close="reportTarget = null" @sent="reportSent" />
   </section>
 </template>
 
@@ -258,5 +283,24 @@ dd {
 }
 .reviews-box h2 {
   margin-top: 0;
+}
+.report-links {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #d9dfda;
+  color: #b6c0ba;
+  font-size: 0.9rem;
+}
+.link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  color: #8f2f21;
+  text-decoration: underline;
+  cursor: pointer;
+  font: inherit;
 }
 </style>

@@ -37,6 +37,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/business/**").hasRole("BUSINESS")
                         .requestMatchers("/api/reservations/**").hasAnyRole("CUSTOMER", "ORGANIZATION")
+                        .requestMatchers("/api/reports/**").hasAnyRole("CUSTOMER", "ORGANIZATION")
                         .anyRequest().authenticated())
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
