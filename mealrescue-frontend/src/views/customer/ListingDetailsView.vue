@@ -6,6 +6,8 @@ import { errorMessage } from '@/api/http'
 import { useAuthStore } from '@/stores/auth'
 import StatusBadge from '@/components/common/StatusBadge.vue'
 import { categoryLabel, formatDateTime, formatPrice } from '@/utils/formatters'
+import ReviewList from '@/components/reviews/ReviewList.vue'
+import { getBusinessReviews } from '@/api/reviews.api'
 
 const props = defineProps({ id: { type: String, required: true } })
 const auth = useAuthStore()
@@ -18,6 +20,7 @@ const quantity = ref(1)
 const reserving = ref(false)
 const reserveError = ref('')
 const confirmation = ref(null) // the reservation the server just created
+const reviews = ref(null)
 
 const canReserve = computed(() => ['CUSTOMER', 'ORGANIZATION'].includes(auth.role))
 
@@ -39,7 +42,17 @@ async function load(quiet = false) {
   }
 }
 
-onMounted(() => load())
+onMounted(async () => {
+  await load()
+  if (data.value) {
+    try {
+      const { data: result } = await getBusinessReviews(data.value.listing.businessId)
+      reviews.value = result
+    } catch {
+      // reviews are extra; the listing still works without them
+    }
+  }
+})
 
 async function reserve() {
   reserveError.value = ''
@@ -150,6 +163,10 @@ async function reserve() {
       </p>
     </template>
   </article>
+    <section v-if="reviews" class="details reviews-box">
+    <h2>Reviews of {{ reviews.businessName }}</h2>
+    <ReviewList :summary="reviews" />
+  </section>
 </template>
 
 <style scoped>
@@ -235,5 +252,11 @@ dd {
 }
 .hint {
   color: #5d6a63;
+}
+.reviews-box {
+  margin-top: 1.5rem;
+}
+.reviews-box h2 {
+  margin-top: 0;
 }
 </style>

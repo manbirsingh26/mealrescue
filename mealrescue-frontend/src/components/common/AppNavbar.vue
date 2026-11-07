@@ -17,6 +17,7 @@ const LINKS_BY_ROLE = {
     { to: '/business/listings', label: 'My listings' },
     { to: '/business/listings/new', label: 'New listing' },
     { to: '/business/reservations', label: 'Reservations' },
+    { to: '/business/reviews', label: 'Reviews' },
   ],
   ADMIN: [{ to: '/admin/verification', label: 'Verification queue' }],
 }

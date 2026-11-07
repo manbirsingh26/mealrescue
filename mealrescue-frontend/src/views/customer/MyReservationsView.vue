@@ -5,6 +5,8 @@ import { errorMessage } from '@/api/http'
 import StatusBadge from '@/components/common/StatusBadge.vue'
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
 import { formatDateTime, formatPrice } from '@/utils/formatters'
+import StarRating from '@/components/reviews/StarRating.vue'
+import { createReview } from '@/api/reviews.api'
 
 const reservations = ref([])
 const loading = ref(true)
@@ -62,6 +64,38 @@ async function confirmCancel() {
     cancelTarget.value = null
   }
 }
+const reviewFor = ref(null) // id of the reservation whose form is open
+const rating = ref(0)
+const comment = ref('')
+const reviewing = ref(false)
+const reviewError = ref('')
+
+function openReview(r) {
+  reviewFor.value = r.id
+  rating.value = 0
+  comment.value = ''
+  reviewError.value = ''
+}
+
+async function submitReview(r) {
+  if (rating.value < 1) {
+    reviewError.value = 'Choose a rating.'
+    return
+  }
+  reviewing.value = true
+  reviewError.value = ''
+  try {
+    await createReview(r.id, rating.value, comment.value)
+    r.reviewed = true
+    reviewFor.value = null
+    notice.value = 'Thanks for your review.'
+  } catch (e) {
+    reviewError.value = errorMessage(e, 'Could not save your review.')
+    if (e.response?.status === 409) await load()
+  } finally {
+    reviewing.value = false
+  }
+}
 </script>
 
 <template>
@@ -102,6 +136,31 @@ async function confirmCancel() {
               </p>
               <button class="btn btn-danger" @click="cancelTarget = r">Cancel</button>
             </div>
+           
+                  <template v-if="r.status === 'PICKED_UP'">
+              <p v-if="r.reviewed" class="muted reviewed">You reviewed this pickup.</p>
+
+              <form v-else-if="reviewFor === r.id" class="review-form" @submit.prevent="submitReview(r)">
+                <StarRating v-model="rating" size="1.6rem" />
+                <textarea
+                  v-model="comment"
+                  rows="3"
+                  maxlength="500"
+                  placeholder="What was it like? (optional)"
+                  aria-label="Comment"
+                ></textarea>
+                <p class="muted counter">{{ comment.length }} / 500</p>
+                <p v-if="reviewError" class="error" role="alert">{{ reviewError }}</p>
+                <div class="review-buttons">
+                  <button class="btn" :disabled="reviewing">
+                    {{ reviewing ? 'Saving...' : 'Submit review' }}
+                  </button>
+                  <button type="button" class="btn btn-light" @click="reviewFor = null">Not now</button>
+                </div>
+              </form>
+
+              <button v-else class="btn btn-light review-open" @click="openReview(r)">Leave a review</button>
+            </template>
           </article>
         </div>
       </section>
@@ -180,5 +239,26 @@ h3 a:hover {
   letter-spacing: 0.15rem;
   color: #1f5c3f;
   margin-left: 0.35rem;
+}
+.reviewed,
+.review-open,
+.review-form {
+  margin-top: 0.75rem;
+}
+.review-form textarea {
+  display: block;
+  width: 100%;
+  margin-top: 0.5rem;
+  font: inherit;
+  padding: 0.5rem;
+  box-sizing: border-box;
+}
+.counter {
+  font-size: 0.8rem;
+  text-align: right;
+}
+.review-buttons {
+  display: flex;
+  gap: 0.75rem;
 }
 </style>

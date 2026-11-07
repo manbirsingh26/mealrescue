@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ import com.mealrescue.model.ReservationStatus;
 import com.mealrescue.model.User;
 import com.mealrescue.repository.ListingRepository;
 import com.mealrescue.repository.ReservationRepository;
+import com.mealrescue.repository.ReviewRepository;
 import com.mealrescue.repository.UserRepository;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -32,13 +35,15 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final ListingRepository listingRepository;
     private final UserRepository userRepository;
+    private final ReviewRepository reviewRepository;
 
     public ReservationService(ReservationRepository reservationRepository,
                               ListingRepository listingRepository,
-                              UserRepository userRepository) {
+                              UserRepository userRepository,ReviewRepository reviewRepository) {
         this.reservationRepository = reservationRepository;
         this.listingRepository = listingRepository;
         this.userRepository = userRepository;
+        this.reviewRepository = reviewRepository;
     }
 
     @Transactional
@@ -83,10 +88,13 @@ public class ReservationService {
         return ReservationResponse.from(reservationRepository.save(reservation));
     }
 
-    @Transactional(readOnly = true)
+        @Transactional(readOnly = true)
     public List<ReservationResponse> myReservations(Long customerId) {
+        Set<Long> reviewed = new HashSet<>(reviewRepository.findReservationIdsByCustomerId(customerId));
         return reservationRepository.findByCustomerIdOrderByCreatedAtDesc(customerId)
-                .stream().map(ReservationResponse::from).toList();
+                .stream()
+                .map(r -> ReservationResponse.from(r, reviewed.contains(r.getId())))
+                .toList();
     }
 
     @Transactional
