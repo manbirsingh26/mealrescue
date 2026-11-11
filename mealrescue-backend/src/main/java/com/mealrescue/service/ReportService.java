@@ -1,9 +1,13 @@
 package com.mealrescue.service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.mealrescue.dto.AdminReportResponse;
 import com.mealrescue.dto.CreateReportRequest;
 import com.mealrescue.dto.ReportResponse;
 import com.mealrescue.exception.ApiException;
@@ -79,5 +83,33 @@ public class ReportService {
         report.setDetails(details);
 
         return ReportResponse.from(reportRepository.save(report));
+    }
+
+        @Transactional(readOnly = true)
+    public List<AdminReportResponse> adminList(ReportStatus status) {
+        List<Report> reports;
+        if (status == null) {
+            reports = reportRepository.findAllByOrderByCreatedAtDesc();
+        } else if (status == ReportStatus.OPEN) {
+            reports = reportRepository.findByStatusOrderByCreatedAtAsc(status);
+        } else {
+            reports = reportRepository.findByStatusOrderByHandledAtDesc(status);
+        }
+        return reports.stream().map(AdminReportResponse::from).toList();
+    }
+
+    @Transactional
+    public AdminReportResponse handle(Long reportId, ReportStatus outcome, String note) {
+        Report report = reportRepository.findById(reportId)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Report not found."));
+
+        if (report.getStatus() != ReportStatus.OPEN) {
+            throw new ApiException(HttpStatus.CONFLICT, "This report has already been handled.");
+        }
+
+        report.setStatus(outcome);
+        report.setAdminNote(note == null || note.isBlank() ? null : note.trim());
+        report.setHandledAt(LocalDateTime.now());
+        return AdminReportResponse.from(report);
     }
 }

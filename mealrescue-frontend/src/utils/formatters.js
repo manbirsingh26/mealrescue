@@ -1,4 +1,5 @@
 import { FOOD_CATEGORIES } from './constants'
+import { REPORT_REASONS } from './constants'
 
 export function formatPrice(value) {
   if (Number(value) === 0) return 'Free'
@@ -21,3 +22,6 @@ export function formatStatus(status) {
 export function categoryLabel(value) {
   return FOOD_CATEGORIES.find((c) => c.value === value)?.label ?? value
 }
+
+export const reportReasonLabel = (value) =>
+  REPORT_REASONS.find((r) => r.value === value)?.label ?? value

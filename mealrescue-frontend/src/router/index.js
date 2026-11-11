@@ -38,6 +38,7 @@ const routes = [
     children: [
       { path: '', redirect: { name: 'admin-verification' } },
       { path: 'verification', name: 'admin-verification', component: () => import('@/views/admin/VerificationQueueView.vue') },
+      { path: 'reports', name: 'admin-reports', component: () => import('@/views/admin/ReportsView.vue') },
     ],
   },
     {
