@@ -57,7 +57,7 @@ public class StatsService {
             AccountStatus status = (AccountStatus) row[1];
             long count = toLong(row[2]);
             if (status == AccountStatus.ACTIVE && role != Role.ADMIN) {
-                activeByRole.merge(role.name(), count, Long::sum);
+                activeByRole.merge(role.name(), count, (a, b) -> a + b);
             } else if (status == AccountStatus.PENDING) {
                 pending += count;
             } else if (status == AccountStatus.DEACTIVATED) {
@@ -107,7 +107,7 @@ public class StatsService {
         }
         for (Object[] row : reservationRepository.pickupsSince(ReservationStatus.PICKED_UP, firstDay.atStartOfDay())) {
             LocalDate day = ((LocalDateTime) row[0]).toLocalDate();
-            perDay.merge(day, toLong(row[1]), Long::sum);
+            perDay.merge(day, toLong(row[1]), (a, b) -> a + b);
         }
         List<AdminStatsResponse.DailyCount> lastTwoWeeks = perDay.entrySet().stream()
                 .map(e -> new AdminStatsResponse.DailyCount(e.getKey(), e.getValue()))
