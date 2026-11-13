@@ -16,3 +16,5 @@ export const reactivateUser = (id) => http.post(`/admin/users/${id}/reactivate`)
 
 export const getAdminListings = (params) => http.get('/admin/listings', { params })
 export const removeListing = (id) => http.post(`/admin/listings/${id}/remove`)
+
+export const getStats = () => http.get('/admin/stats')

@@ -20,6 +20,7 @@ const LINKS_BY_ROLE = {
     { to: '/business/reviews', label: 'Reviews' },
   ],
   ADMIN: [
+  { to: '/admin/dashboard', label: 'Dashboard' },
    { to: '/admin/verification', label: 'Verification queue' },
    { to: '/admin/users', label: 'Users' },
    { to: '/admin/listings', label: 'Listings' },

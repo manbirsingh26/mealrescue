@@ -36,11 +36,12 @@ const routes = [
     component: DefaultLayout,
     meta: { requiresAuth: true, roles: [ROLES.ADMIN] },
     children: [
-      { path: '', redirect: { name: 'admin-verification' } },
+      { path: '', redirect: { name: 'admin-dashboard' } },
       { path: 'verification', name: 'admin-verification', component: () => import('@/views/admin/VerificationQueueView.vue') },
       { path: 'reports', name: 'admin-reports', component: () => import('@/views/admin/ReportsView.vue') },
       { path: 'users', name: 'admin-users', component: () => import('@/views/admin/UsersView.vue') },
       { path: 'listings', name: 'admin-listings', component: () => import('@/views/admin/ListingsView.vue') },
+      { path: 'dashboard', name: 'admin-dashboard', component: () => import('@/views/admin/DashboardView.vue') },
     ],
   },
     {

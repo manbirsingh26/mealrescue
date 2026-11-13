@@ -24,4 +24,6 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
     @EntityGraph(attributePaths = {"reporter", "listing", "business"})
     List<Report> findAllByOrderByCreatedAtDesc();
 
+    long countByStatus(ReportStatus status);
+
         }

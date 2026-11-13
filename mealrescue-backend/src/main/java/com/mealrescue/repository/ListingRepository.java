@@ -7,6 +7,7 @@ import com.mealrescue.model.ListingStatus;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -22,5 +23,8 @@ public interface ListingRepository extends JpaRepository<Listing, Long>, JpaSpec
 
     @EntityGraph(attributePaths = {"business"})
     List<Listing> findAllByOrderByCreatedAtDesc();
+
+    @Query("select l.status, count(l) from Listing l group by l.status")
+    List<Object[]> countByStatus();
     
 }
