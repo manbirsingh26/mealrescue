@@ -1,6 +1,7 @@
 package com.mealrescue.repository;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,4 +45,10 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Query("select r.pickedUpAt, r.quantity from Reservation r "
          + "where r.status = :status and r.pickedUpAt >= :from")
     List<Object[]> pickupsSince(@Param("status") ReservationStatus status, @Param("from") LocalDateTime from); 
+
+        @Query("select coalesce(sum(r.quantity), 0) from Reservation r "
+         + "where r.customer.id = :customerId and r.listing.id = :listingId and r.status in :statuses")
+    long sumQuantity(@Param("customerId") Long customerId,
+                     @Param("listingId") Long listingId,
+                     @Param("statuses") Collection<ReservationStatus> statuses);
 }

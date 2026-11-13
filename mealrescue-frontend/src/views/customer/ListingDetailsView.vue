@@ -9,6 +9,7 @@ import { categoryLabel, formatDateTime, formatPrice } from '@/utils/formatters'
 import ReviewList from '@/components/reviews/ReviewList.vue'
 import { getBusinessReviews } from '@/api/reviews.api'
 import ReportDialog from '@/components/reports/ReportDialog.vue'
+import { RESERVATION_LIMITS } from '@/utils/constants'
 
 const props = defineProps({ id: { type: String, required: true } })
 const auth = useAuthStore()
@@ -27,6 +28,11 @@ const reportTarget = ref(null)
 const reportNotice = ref('')
 
 const canReserve = computed(() => ['CUSTOMER', 'ORGANIZATION'].includes(auth.role))
+const roleLimit = computed(() => RESERVATION_LIMITS[auth.role] ?? 0)
+// the most this user can take right now: their limit, or what's left, whichever is smaller
+const maxQuantity = computed(() =>
+  data.value ? Math.min(roleLimit.value, data.value.listing.quantityRemaining) : 0,
+)
 
 // display only; the server calculates the real total
 const total = computed(() => {
@@ -65,6 +71,10 @@ async function reserve() {
 
   if (!Number.isInteger(qty) || qty < 1) {
     reserveError.value = 'Enter a whole number of 1 or more.'
+    return
+  }
+  if (qty > roleLimit.value) {
+    reserveError.value = `You can reserve up to ${roleLimit.value} portions at a time.`
     return
   }
   if (qty > left) {
@@ -163,10 +173,11 @@ function reportSent() {
             v-model.number="quantity"
             type="number"
             min="1"
-            :max="data.listing.quantityRemaining"
+            :max="maxQuantity"
             step="1"
           />
         </div>
+        <p class="limit">Up to {{ roleLimit }} per {{ auth.role === 'ORGANIZATION' ? 'organization' : 'person' }} on this listing</p>
         <p class="total">Total: {{ formatPrice(total) }}</p>
         <p v-if="reserveError" class="error" role="alert">{{ reserveError }}</p>
         <button class="btn" :disabled="reserving">{{ reserving ? 'Reserving...' : 'Reserve' }}</button>
@@ -302,5 +313,10 @@ dd {
   text-decoration: underline;
   cursor: pointer;
   font: inherit;
+}
+.limit {
+  color: #5d6a63;
+  font-size: 0.85rem;
+  margin: -0.5rem 0 0.5rem;
 }
 </style>

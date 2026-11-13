@@ -19,6 +19,7 @@ import com.mealrescue.model.Listing;
 import com.mealrescue.model.ListingStatus;
 import com.mealrescue.model.Reservation;
 import com.mealrescue.model.ReservationStatus;
+import com.mealrescue.model.Role;
 import com.mealrescue.model.User;
 import com.mealrescue.repository.ListingRepository;
 import com.mealrescue.repository.ReservationRepository;
@@ -31,7 +32,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReservationService {
 
     private static final SecureRandom RANDOM = new SecureRandom();
-
+        public static final int CUSTOMER_LIMIT = 10;
+    public static final int ORGANIZATION_LIMIT = 50;
     private final ReservationRepository reservationRepository;
     private final ListingRepository listingRepository;
     private final UserRepository userRepository;
@@ -51,6 +53,18 @@ public class ReservationService {
         User customer = userRepository.findById(customerId)
                 .filter(u -> u.getStatus() == AccountStatus.ACTIVE)
                 .orElseThrow(() -> new ApiException(HttpStatus.FORBIDDEN, "Your account cannot reserve food."));
+        
+                int limit = customer.getRole() == Role.ORGANIZATION ? ORGANIZATION_LIMIT : CUSTOMER_LIMIT;
+        long already = reservationRepository.sumQuantity(customerId, request.listingId(),
+                List.of(ReservationStatus.RESERVED, ReservationStatus.PICKED_UP));
+
+        if (already + request.quantity() > limit) {
+            long room = Math.max(0, limit - already);
+            String who = customer.getRole() == Role.ORGANIZATION ? "an organization" : "a customer";
+            throw new ApiException(HttpStatus.BAD_REQUEST, room == 0
+                    ? "You have reached the limit of " + limit + " portions for " + who + " on this listing."
+                    : "You can reserve " + room + " more from this listing (limit " + limit + " for " + who + ").");
+        }
 
         Listing listing = listingRepository.findById(request.listingId())
                 .filter(l -> l.getBusiness().getStatus() == AccountStatus.ACTIVE)

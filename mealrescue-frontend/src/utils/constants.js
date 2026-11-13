@@ -34,3 +34,9 @@ export const HOME_BY_ROLE = {
 // Keys used to save the login in the browser's localStorage
 export const TOKEN_KEY = 'mealrescue_token'
 export const USER_KEY = 'mealrescue_user'
+
+// must match CUSTOMER_LIMIT and ORGANIZATION_LIMIT in ReservationService.java
+export const RESERVATION_LIMITS = {
+  CUSTOMER: 10,
+  ORGANIZATION: 50,
+}

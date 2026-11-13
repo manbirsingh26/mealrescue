@@ -129,6 +129,7 @@ async function submitReview(r) {
             <p class="muted">
               Pickup {{ formatDateTime(r.pickupStart) }} to {{ formatDateTime(r.pickupEnd) }}
             </p>
+            <p class="muted">At {{ r.businessAddress || 'address not provided' }}</p>
 
             <div v-if="s.key === 'upcoming'" class="bottom">
               <p class="code-line">
