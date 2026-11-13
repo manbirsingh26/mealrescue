@@ -19,7 +19,12 @@ const LINKS_BY_ROLE = {
     { to: '/business/reservations', label: 'Reservations' },
     { to: '/business/reviews', label: 'Reviews' },
   ],
-  ADMIN: [{ to: '/admin/verification', label: 'Verification queue' }, { to: '/admin/reports', label: 'Reports' },],
+  ADMIN: [
+   { to: '/admin/verification', label: 'Verification queue' },
+   { to: '/admin/users', label: 'Users' },
+   { to: '/admin/listings', label: 'Listings' },
+   { to: '/admin/reports', label: 'Reports' },
+  ],
 }
 
 // Same links on every page; Contact us is always last

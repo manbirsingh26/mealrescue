@@ -27,4 +27,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Reservation> findByListingIdAndStatus(Long listingId, ReservationStatus status);
 
         List<Reservation> findByStatusAndListingPickupEndLessThanEqual(ReservationStatus status, LocalDateTime time);
+
+        List<Reservation> findByCustomerIdAndStatus(Long customerId, ReservationStatus status);
 }

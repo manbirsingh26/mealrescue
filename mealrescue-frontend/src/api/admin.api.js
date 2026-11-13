@@ -9,3 +9,10 @@ export const getReports = (status) =>
 export const resolveReport = (id, note) => http.post(`/admin/reports/${id}/resolve`, { note })
 
 export const dismissReport = (id, note) => http.post(`/admin/reports/${id}/dismiss`, { note })
+
+export const getUsers = (params) => http.get('/admin/users', { params })
+export const deactivateUser = (id) => http.post(`/admin/users/${id}/deactivate`)
+export const reactivateUser = (id) => http.post(`/admin/users/${id}/reactivate`)
+
+export const getAdminListings = (params) => http.get('/admin/listings', { params })
+export const removeListing = (id) => http.post(`/admin/listings/${id}/remove`)

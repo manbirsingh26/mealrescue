@@ -1,6 +1,7 @@
 <script setup>
-import { onMounted, reactive, ref } from 'vue'
-import { dismissReport, getReports, resolveReport } from '@/api/admin.api'
+import { computed,onMounted, reactive, ref } from 'vue'
+import { deactivateUser, dismissReport, getReports, removeListing, resolveReport } from '@/api/admin.api'
+import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
 import { errorMessage } from '@/api/http'
 import StatusBadge from '@/components/common/StatusBadge.vue'
 import { formatDateTime, formatStatus, reportReasonLabel } from '@/utils/formatters'
@@ -63,6 +64,47 @@ async function handle(report, action) {
     if (e.response?.status === 409) load()
   } finally {
     busyId.value = null
+  }
+}
+
+const action = ref(null) // { kind: 'listing' | 'business', report }
+const acting = ref(false)
+
+const actionText = computed(() => {
+  const a = action.value
+  if (!a) return { title: '', message: '', confirm: '' }
+  return a.kind === 'listing'
+    ? {
+        title: 'Remove this listing?',
+        message: `“${a.report.listingTitle}” will be taken down and its open reservations cancelled.`,
+        confirm: 'Remove listing',
+      }
+    : {
+        title: 'Deactivate this business?',
+        message: `${a.report.businessName} will be logged out. Its active listings and the reservations on them will be cancelled.`,
+        confirm: 'Deactivate business',
+      }
+})
+
+async function confirmAction() {
+  const { kind, report } = action.value
+  acting.value = true
+  error.value = ''
+  notice.value = ''
+  try {
+    if (kind === 'listing') {
+      await removeListing(report.listingId)
+      notice.value = 'Listing removed. Resolve the report when you are done.'
+    } else {
+      await deactivateUser(report.businessId)
+      notice.value = 'Business deactivated. Resolve the report when you are done.'
+    }
+    await load() // refresh the listing and business statuses on every card
+  } catch (e) {
+    error.value = errorMessage(e, 'Could not complete this action.')
+  } finally {
+    acting.value = false
+    action.value = null
   }
 }
 </script>
@@ -138,6 +180,22 @@ async function handle(report, action) {
       </dl>
 
       <div v-if="r.status === 'OPEN'" class="handle">
+                <div
+          v-if="(r.listingId && ['ACTIVE', 'SOLD_OUT'].includes(r.listingStatus)) || r.businessStatus === 'ACTIVE'"
+          class="take-action"
+        >
+          <span class="muted small">Take action:</span>
+          <button
+            v-if="r.listingId && ['ACTIVE', 'SOLD_OUT'].includes(r.listingStatus)"
+            class="btn btn-danger"
+            @click="action = { kind: 'listing', report: r }"
+          >Remove listing</button>
+          <button
+            v-if="r.businessStatus === 'ACTIVE'"
+            class="btn btn-danger"
+            @click="action = { kind: 'business', report: r }"
+          >Deactivate business</button>
+        </div>
         <label :for="`note-${r.id}`">Note (optional)</label>
         <textarea
           :id="`note-${r.id}`"
@@ -153,6 +211,16 @@ async function handle(report, action) {
       </div>
     </article>
   </template>
+  <ConfirmDialog
+    :open="!!action"
+    :title="actionText.title"
+    :message="actionText.message"
+    :confirm-label="actionText.confirm"
+    cancel-label="Go back"
+    :busy="acting"
+    @confirm="confirmAction"
+    @cancel="action = null"
+  />
 </template>
 
 <style scoped>
@@ -239,5 +307,12 @@ dd a {
 .buttons {
   display: flex;
   gap: 0.75rem;
+}
+.take-action {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 0.9rem;
 }
 </style>
