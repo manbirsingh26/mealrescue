@@ -44,11 +44,28 @@ export const useAuthStore = defineStore('auth', {
       localStorage.setItem(USER_KEY, JSON.stringify(user))
     },
 
-    logout() {
+        // tell the server first, so the token stops working everywhere, then clear the browser
+    async logout() {
+      try {
+        if (this.token) await authApi.logout()
+      } catch {
+        // server unreachable or token already dead: still log out locally
+      } finally {
+        this.clearSession()
+      }
+    },
+
+    clearSession() {
       this.token = null
       this.user = null
       localStorage.removeItem(TOKEN_KEY)
       localStorage.removeItem(USER_KEY)
+    },
+
+    // keep the navbar and saved user in step after a profile change
+    updateUser(changes) {
+      this.user = { ...this.user, ...changes }
+      localStorage.setItem(USER_KEY, JSON.stringify(this.user))
     },
   },
 })

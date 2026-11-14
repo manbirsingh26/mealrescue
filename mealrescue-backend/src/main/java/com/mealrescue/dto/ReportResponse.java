@@ -11,7 +11,7 @@ public record ReportResponse(
         Long id, Long listingId, String listingTitle,
         Long businessId, String businessName,
         ReportReason reason, String details, ReportStatus status,
-        LocalDateTime createdAt) {
+        LocalDateTime createdAt, String adminNote, LocalDateTime handledAt) {
 
     public static ReportResponse from(Report r) {
         Listing l = r.getListing();
@@ -21,6 +21,6 @@ public record ReportResponse(
                 l == null ? null : l.getTitle(),
                 r.getBusiness().getId(), r.getBusiness().getName(),
                 r.getReason(), r.getDetails(), r.getStatus(),
-                r.getCreatedAt());
+                r.getCreatedAt(), r.getAdminNote(), r.getHandledAt());
     }
 }

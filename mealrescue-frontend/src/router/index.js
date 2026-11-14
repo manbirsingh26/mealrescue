@@ -55,6 +55,12 @@ const routes = [
       { path: 'listings/new', name: 'business-listing-new', component: () => import('@/views/business/ListingEditView.vue') },
       { path: 'listings/:id/edit', name: 'business-listing-edit', component: () => import('@/views/business/ListingEditView.vue'), props: true },
       { path: 'reviews', name: 'business-reviews', component: () => import('@/views/business/BusinessReviewsView.vue') },
+      {
+        path: 'profile',
+        name: 'profile',
+        component: () => import('@/views/profile/ProfileView.vue'),
+        meta: { requiresAuth: true },
+      },
     ],
   },
   { path: '/:pathMatch(.*)*', name: 'not-found', component: () => import('@/views/public/NotFoundView.vue') },

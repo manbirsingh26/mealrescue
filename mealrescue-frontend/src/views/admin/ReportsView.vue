@@ -196,13 +196,13 @@ async function confirmAction() {
             @click="action = { kind: 'business', report: r }"
           >Deactivate business</button>
         </div>
-        <label :for="`note-${r.id}`">Note (optional)</label>
+        <label :for="`note-${r.id}`">Note to the reporter (optional)</label>
         <textarea
           :id="`note-${r.id}`"
           v-model="notes[r.id]"
           rows="2"
           maxlength="1000"
-          placeholder="What did you find or do?"
+          placeholder="The reporter will see this note."
         ></textarea>
         <div class="buttons">
           <button class="btn" :disabled="busyId === r.id" @click="handle(r, 'resolve')">Resolve</button>

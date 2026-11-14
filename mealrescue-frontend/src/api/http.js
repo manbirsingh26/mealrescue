@@ -17,7 +17,8 @@ http.interceptors.request.use((config) => {
 http.interceptors.response.use(
   (response) => response,
   (error) => {
-    const isAuthCall = error.config.url.includes('/auth/')
+        const isAuthCall =
+      error.config.url.includes('/auth/') || error.config.url.includes('/users/me/logout')
     if (error.response?.status === 401 && !isAuthCall) {
       localStorage.removeItem(TOKEN_KEY)
       localStorage.removeItem(USER_KEY)

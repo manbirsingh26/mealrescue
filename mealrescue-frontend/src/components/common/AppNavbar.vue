@@ -34,8 +34,8 @@ const links = computed(() => {
   return [...own, CONTACT]
 })
 
-function logout() {
-  auth.logout()
+async function logout() {
+  await auth.logout()
   router.push('/')
 }
 </script>
@@ -54,7 +54,7 @@ function logout() {
 
       <div class="actions">
         <template v-if="auth.isAuthenticated">
-          <span class="who">{{ auth.user.name }}</span>
+        <router-link to="/profile" class="who" title="Your profile">{{ auth.user.name }}</router-link>
           <button class="btn btn-light" @click="logout">Log out</button>
         </template>
         <template v-else>
@@ -121,5 +121,14 @@ function logout() {
 }
 .who {
   color: #5d6a63;
+  text-decoration: none;
+}
+.who:hover {
+  color: #2f6b4f;
+  text-decoration: underline;
+}
+.who.router-link-exact-active {
+  color: #2f6b4f;
+  font-weight: 600;
 }
 </style>

@@ -2,6 +2,8 @@ package com.mealrescue.security;
 
 import com.mealrescue.model.AccountStatus;
 import com.mealrescue.repository.UserRepository;
+
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -35,9 +37,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if (header != null && header.startsWith("Bearer ")) {
             String token = header.substring(7);
             try {
-                Long userId = jwtService.extractUserId(token);
+                Claims claims = jwtService.parse(token);
+                Long userId = Long.valueOf(claims.getSubject());
+                int tokenVersion = jwtService.tokenVersion(claims);
+
                 userRepository.findById(userId)
                         .filter(user -> user.getStatus() == AccountStatus.ACTIVE)
+                        .filter(user -> user.getTokenVersion() == tokenVersion)
                         .ifPresent(user -> {
                             var authority = new SimpleGrantedAuthority("ROLE_" + user.getRole().name());
                             var authentication = new UsernamePasswordAuthenticationToken(user, null, List.of(authority));

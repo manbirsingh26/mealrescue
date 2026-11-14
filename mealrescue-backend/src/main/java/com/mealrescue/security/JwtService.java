@@ -25,26 +25,36 @@ public class JwtService {
         this.expirationMinutes = expirationMinutes;
     }
 
-    // Creates a signed token that says "this is user #id with this role"
+    // Creates a signed token that says "this is user #id with this role, issued at token version N"
     public String generateToken(User user) {
         Instant now = Instant.now();
         return Jwts.builder()
                 .subject(String.valueOf(user.getId()))
                 .claim("role", user.getRole().name())
+                .claim("tv", user.getTokenVersion())
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plus(expirationMinutes, ChronoUnit.MINUTES)))
                 .signWith(key)
                 .compact();
     }
 
-    // Checks the signature and expiry, then returns the user id inside the token.
+    // Checks the signature and expiry and returns everything inside the token.
     // Throws an exception if the token is fake, changed or expired.
-    public Long extractUserId(String token) {
-        Claims claims = Jwts.parser()
+    public Claims parse(String token) {
+        return Jwts.parser()
                 .verifyWith(key)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
-        return Long.valueOf(claims.getSubject());
+    }
+
+    public Long extractUserId(String token) {
+        return Long.valueOf(parse(token).getSubject());
+    }
+
+    // tokens made before this feature have no "tv" claim; they count as version 0
+    public int tokenVersion(Claims claims) {
+        Integer tv = claims.get("tv", Integer.class);
+        return tv == null ? 0 : tv;
     }
 }

@@ -37,6 +37,10 @@ public class User {
     @Column(name = "rejection_reason")
     private String rejectionReason;
 
+    // goes up by one on every logout; tokens carrying an older number stop working
+    @Column(name = "token_version")
+    private Integer tokenVersion;
+
     public Long getId() { return id; }
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
@@ -53,4 +57,6 @@ public class User {
     public void setProfile(AccountProfile profile) { this.profile = profile; }
     public String getRejectionReason() { return rejectionReason; }
     public void setRejectionReason(String rejectionReason) { this.rejectionReason = rejectionReason; }
+    public int getTokenVersion() { return tokenVersion == null ? 0 : tokenVersion; }
+    public void bumpTokenVersion() { this.tokenVersion = getTokenVersion() + 1; }
 }

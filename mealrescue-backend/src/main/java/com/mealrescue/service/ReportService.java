@@ -112,4 +112,10 @@ public class ReportService {
         report.setHandledAt(LocalDateTime.now());
         return AdminReportResponse.from(report);
     }
+
+    @Transactional(readOnly = true)
+    public List<ReportResponse> myReports(Long reporterId) {
+        return reportRepository.findByReporterIdOrderByCreatedAtDesc(reporterId)
+                .stream().map(ReportResponse::from).toList();
+    }
 }
