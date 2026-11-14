@@ -68,8 +68,12 @@ function logout() {
 
 <style scoped>
 .nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
   background: #fff;
   border-bottom: 1px solid #d9dfda;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 .bar {
   max-width: 1100px;

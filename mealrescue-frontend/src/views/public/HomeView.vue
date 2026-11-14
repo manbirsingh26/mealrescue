@@ -2,10 +2,10 @@
 import { computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import AppNavbar from '@/components/common/AppNavbar.vue'
-
+import AppFooter from '@/components/common/AppFooter.vue'
 const auth = useAuthStore()
 
-// Customers and organizations have no area of their own yet, so the shortcut only shows for roles that do
+// Logged-in users get a shortcut to their own home page
 const areaLink = computed(() =>
   auth.isAuthenticated && auth.homeRoute !== '/' ? auth.homeRoute : null,
 )
@@ -122,9 +122,7 @@ const audiences = [
       </section>
     </main>
 
-    <footer class="foot">
-      <div class="container">&copy; 2026 Meal Rescue</div>
-    </footer>
+    <AppFooter />
   </div>
 </template>
 
@@ -333,11 +331,7 @@ h1 {
   color: #1d2521;
 }
 
-.foot {
-  padding: 1.5rem 0;
-  color: #5d6a63;
-  font-size: 0.9rem;
-}
+
 
 /* ---------- small screens ---------- */
 @media (max-width: 820px) {
@@ -352,12 +346,6 @@ h1 {
   .sample {
     transform: none;
   }
-  .actions {
-    gap: 0.4rem;
-  }
-  .actions .btn {
-    padding: 0.4rem 0.7rem;
-    font-size: 0.9rem;
-  }
+  
 }
 </style>
