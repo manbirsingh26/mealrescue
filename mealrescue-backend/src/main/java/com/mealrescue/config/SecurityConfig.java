@@ -34,6 +34,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/businesses/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/listings/**").hasRole("BUSINESS")
                         .requestMatchers(HttpMethod.PUT, "/api/listings/**").hasRole("BUSINESS")
+                        .requestMatchers(HttpMethod.GET, "/api/impact").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/business/**").hasRole("BUSINESS")
                         .requestMatchers("/api/reservations/**").hasAnyRole("CUSTOMER", "ORGANIZATION")

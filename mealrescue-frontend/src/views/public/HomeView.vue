@@ -1,8 +1,9 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import AppNavbar from '@/components/common/AppNavbar.vue'
 import AppFooter from '@/components/common/AppFooter.vue'
+import { getImpact } from '@/api/impact.api'
 const auth = useAuthStore()
 
 // Logged-in users get a shortcut to their own home page
@@ -42,6 +43,30 @@ const audiences = [
     tone: 'dark',
   },
 ]
+
+const impact = ref(null)
+
+onMounted(async () => {
+  try {
+    const { data } = await getImpact()
+    impact.value = data
+  } catch {
+    // the homepage works without it; the section just stays hidden
+  }
+})
+
+const fmt = (n) => Number(n).toLocaleString('en-CA')
+
+const impactFigures = computed(() => {
+  const i = impact.value
+  if (!i) return []
+  return [
+    { value: fmt(i.portions), label: 'portions of food rescued' },
+    { value: `${fmt(i.foodKg)} kg`, label: 'of food kept out of the bin (estimated)' },
+    { value: `${fmt(i.co2Kg)} kg`, label: 'of CO₂e emissions avoided (estimated)' },
+    { value: fmt(i.businesses), label: i.businesses === 1 ? 'local business taking part' : 'local businesses taking part' },
+  ]
+})
 </script>
 
 <template>
@@ -98,7 +123,22 @@ const audiences = [
           </ol>
         </div>
       </section>
-
+      <section v-if="impact && impact.portions > 0" class="section impact" aria-labelledby="impact-title">
+        <div class="container">
+          <h2 id="impact-title">Rescued so far</h2>
+          <ul class="figures">
+            <li v-for="f in impactFigures" :key="f.label">
+              <span class="figure">{{ f.value }}</span>
+              <span class="caption">{{ f.label }}</span>
+            </li>
+          </ul>
+          <p class="footnote">
+            Counted from {{ fmt(impact.pickups) }} completed pickups. Food and CO₂ are estimates,
+            assuming about {{ impact.kgPerPortion }} kg of food per portion and
+            {{ impact.co2PerKg }} kg of CO₂e avoided per kg of food not wasted.
+          </p>
+        </div>
+      </section>
       <section class="section alt">
         <div class="container">
           <h2>Who it is for</h2>
@@ -332,6 +372,42 @@ h1 {
 }
 
 
+/* ---------- impact ---------- */
+.impact {
+  padding-top: 0;
+}
+.figures {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-top: 2px solid #2f6b4f;
+}
+.figures li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1.25rem 1.25rem 0.5rem 0;
+}
+.figure {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(1.9rem, 4vw, 2.6rem);
+  font-weight: 700;
+  line-height: 1.1;
+  color: #1f5c3f;
+}
+.caption {
+  color: #36423b;
+  line-height: 1.4;
+}
+.footnote {
+  margin: 1.25rem 0 0;
+  max-width: 44rem;
+  font-size: 0.85rem;
+  color: #5d6a63;
+  line-height: 1.5;
+}
 
 /* ---------- small screens ---------- */
 @media (max-width: 820px) {
@@ -345,6 +421,9 @@ h1 {
   }
   .sample {
     transform: none;
+  }
+  .figures {
+    grid-template-columns: repeat(2, 1fr);
   }
   
 }

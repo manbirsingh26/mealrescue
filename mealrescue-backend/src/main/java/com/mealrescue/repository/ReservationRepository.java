@@ -46,9 +46,13 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
          + "where r.status = :status and r.pickedUpAt >= :from")
     List<Object[]> pickupsSince(@Param("status") ReservationStatus status, @Param("from") LocalDateTime from); 
 
-        @Query("select coalesce(sum(r.quantity), 0) from Reservation r "
+     @Query("select coalesce(sum(r.quantity), 0) from Reservation r "
          + "where r.customer.id = :customerId and r.listing.id = :listingId and r.status in :statuses")
     long sumQuantity(@Param("customerId") Long customerId,
                      @Param("listingId") Long listingId,
                      @Param("statuses") Collection<ReservationStatus> statuses);
+
+    @Query("select count(r), coalesce(sum(r.quantity), 0), count(distinct l.business.id) "
+         + "from Reservation r join r.listing l where r.status = :status")
+    List<Object[]> platformTotals(@Param("status") ReservationStatus status);
 }
