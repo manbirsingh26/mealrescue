@@ -125,10 +125,13 @@ async function logout() {
 }
 .who:hover {
   color: #2f6b4f;
-  text-decoration: underline;
+  text-decoration: none;
 }
 .who.router-link-exact-active {
   color: #2f6b4f;
   font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 6px;
 }
 </style>
