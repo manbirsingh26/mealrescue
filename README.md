@@ -2,7 +2,7 @@
 
 MealRescue is a web platform that connects local businesses that have surplus food (bakeries, restaurants, grocery stores) with customers and community organizations who can use it. Businesses post what is left over at a reduced price with a pickup window, people reserve it online, and the business confirms the pickup with a one-time code. The goal is to keep good food out of the landfill.
 
-It has been built for **CSIS 3175 Software Engineering** at Douglas College (Fall 2026).
+The project was built for **CSIS 3175 Software Engineering** at Douglas College (Fall 2026).
 
 - **Team:** Manbir and Mani Singh
 - **Instructor:** Zhe Yang
@@ -174,11 +174,37 @@ npm run dev
 
 Open **http://localhost:5173**. Calls to `/api` are forwarded to the back end automatically.
 
-### 5. Try it out
+### 5. Demo data
 
-1. Log in as the admin with the email and password from `application-local.properties`.
-2. Register a **business** and an **organization** on the Register page, then approve them in the admin **Verification queue**. Customers can log in straight after registering.
-3. As the business, create a listing. As a customer, reserve it and note the pickup code. As the business, confirm the pickup with that code on the **Reservations** page.
+On its first start with an **empty** database, the back end fills it with realistic sample data (`app.demo-data=true` in `application.properties`). You can log in straight away as any role:
+
+| Role | Email | Password |
+|---|---|---|
+| Admin | the `app.admin.email` from `application-local.properties` | the `app.admin.password` you chose |
+| Business (bakery) | `bakery@example.com` | `Demo1234!` |
+| Business (café) | `cafe@example.com` | `Demo1234!` |
+| Business (grocer) | `grocer@example.com` | `Demo1234!` |
+| Organization | `pantry@example.com` | `Demo1234!` |
+| Customer | `priya@example.com` | `Demo1234!` |
+| Customer | `jordan@example.com` | `Demo1234!` |
+| Customer | `emma@example.com` | `Demo1234!` |
+
+Two more accounts, `deli@example.com` (business) and `shelter@example.com` (organization), are **pending**. They appear in the admin's Verification queue and can't log in until approved.
+
+The data includes current listings in every category (open now and for the next few days), sold-out, cancelled, removed and past listings, reservations in every status over the last two weeks, reviews, and reports (open, resolved and dismissed). All names, emails and addresses are invented.
+
+Good to know:
+
+- The seeder runs only when the database has no business accounts, so restarting never creates duplicates and it never touches existing data.
+- Pickup times are set relative to the moment the data is created. After a few days, current listings expire like real ones. To get fresh demo data, drop and recreate the database, then start the back end again.
+- To start with an empty database instead, set `app.demo-data=false` in `application-local.properties`.
+
+### 6. Try it out
+
+1. Log in as `bakery@example.com` and open **Reservations**: customers are waiting to pick up.
+2. Log in as `priya@example.com`, open **Your reservations**, and note the pickup code of an upcoming reservation.
+3. Back as the bakery, enter that code under **Confirm a pickup**.
+4. Log in as the admin to see the **Dashboard**, the **Verification queue** and the open **Reports**.
 
 ---
 
