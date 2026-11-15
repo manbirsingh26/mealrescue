@@ -1,6 +1,8 @@
 package com.mealrescue.repository;
 
 import com.mealrescue.model.AccountStatus;
+import com.mealrescue.model.Role;
+
 import java.util.List;
 import com.mealrescue.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,4 +18,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("select u.role, u.status, count(u) from User u group by u.role, u.status")
     List<Object[]> countByRoleAndStatus();
+
+    boolean existsByRole(Role role);
 }

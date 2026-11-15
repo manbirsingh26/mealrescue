@@ -75,4 +75,5 @@ public class Listing {
     public ListingStatus getStatus() { return status; }
     public void setStatus(ListingStatus status) { this.status = status; }
     public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

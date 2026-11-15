@@ -19,6 +19,11 @@
       "name": "app.admin.password",
       "type": "java.lang.String",
       "description": "Password of the admin account created at startup."
+    },
+    {
+      "name": "app.demo-data",
+      "type": "java.lang.Boolean",
+      "description": "Fill an empty database with sample data on startup."
     }
   ]
 }
