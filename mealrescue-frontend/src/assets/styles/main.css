@@ -1,3 +1,6 @@
+:root {
+  --page-width: 1300px;
+}
 body {
   margin: 0;
   font-family: system-ui, sans-serif;

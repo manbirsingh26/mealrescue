@@ -76,7 +76,7 @@ async function logout() {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 .bar {
-  max-width: 1100px;
+  max-width: var(--page-width);
   margin: 0 auto;
   padding: 0 1rem;
   min-height: 64px;

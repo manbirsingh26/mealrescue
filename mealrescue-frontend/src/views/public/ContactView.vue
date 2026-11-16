@@ -66,6 +66,15 @@ dd {
 }
 dd a {
   color: #2f6b4f;
+  text-decoration: none;
+}
+dd a:hover {
+  text-decoration: underline;
+}
+dd a:focus-visible {
+  outline: 2px solid #2f6b4f;
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 .muted {
   color: #5d6a63;

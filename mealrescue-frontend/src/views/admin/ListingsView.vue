@@ -101,10 +101,13 @@ async function confirmRemove() {
           <tr v-for="l in listings" :key="l.id">
             <td><router-link :to="`/listings/${l.id}`">{{ l.title }}</router-link></td>
             <td>{{ l.businessName }}</td>
-            <td>{{ l.quantityRemaining }} / {{ l.quantityTotal }}</td>
-            <td>{{ formatPrice(l.price) }}</td>
-            <td>{{ formatDateTime(l.pickupStart) }} to {{ formatDateTime(l.pickupEnd) }}</td>
-            <td><StatusBadge :status="l.status" /></td>
+            <td class="nowrap">{{ l.quantityRemaining }} / {{ l.quantityTotal }}</td>
+            <td class="nowrap">{{ formatPrice(l.price) }}</td>
+            <td class="nowrap">
+            {{ formatDateTime(l.pickupStart) }}<br />
+            <span class="muted">to {{ formatDateTime(l.pickupEnd) }}</span>
+          </td>
+            <td class="nowrap"><StatusBadge :status="l.status" /></td>
             <td>
               <button v-if="canRemove(l)" class="btn btn-danger" @click="removeTarget = l">Remove</button>
             </td>
@@ -145,6 +148,9 @@ async function confirmRemove() {
   .filters {
     grid-template-columns: 1fr;
   }
+}
+.nowrap {
+  white-space: nowrap;
 }
 .muted {
   color: #5d6a63;

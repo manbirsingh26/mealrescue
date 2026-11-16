@@ -173,7 +173,7 @@ const impactFigures = computed(() => {
   min-height: 100vh;
 }
 .container {
-  max-width: 1100px;
+  max-width: var(--page-width);
   margin: 0 auto;
   padding: 0 1rem;
 }

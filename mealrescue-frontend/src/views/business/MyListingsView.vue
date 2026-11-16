@@ -61,8 +61,8 @@ async function confirmCancel() {
 
   <template v-else>
     <p v-if="listings.length === 0">You have no listings yet. Create your first one.</p>
-
-    <table v-else>
+<div v-else class="table-wrap">
+    <table >
       <thead>
         <tr>
           <th>Title</th>
@@ -78,10 +78,13 @@ async function confirmCancel() {
         <tr v-for="l in listings" :key="l.id">
           <td>{{ l.title }}</td>
           <td>{{ categoryLabel(l.category) }}</td>
-          <td>{{ l.quantityRemaining }} / {{ l.quantityTotal }}</td>
-          <td>{{ formatPrice(l.price) }}</td>
-          <td>{{ formatDateTime(l.pickupStart) }} to {{ formatDateTime(l.pickupEnd) }}</td>
-          <td><StatusBadge :status="l.status" /></td>
+          <td class="nowrap">{{ l.quantityRemaining }} / {{ l.quantityTotal }}</td>
+          <td class="nowrap">{{ formatPrice(l.price) }}</td>
+          <td class="nowrap">
+            {{ formatDateTime(l.pickupStart) }}<br />
+            <span class="muted">to {{ formatDateTime(l.pickupEnd) }}</span>
+          </td>
+          <td class="nowrap"><StatusBadge :status="l.status" /></td>
           <td >
             <div v-if="canChange(l)" class="actions">
               <router-link :to="`/business/listings/${l.id}/edit`" class="btn btn-light">Edit</router-link>
@@ -91,6 +94,7 @@ async function confirmCancel() {
         </tr>
       </tbody>
     </table>
+  </div>
   </template>
 
   <ConfirmDialog
@@ -110,6 +114,9 @@ async function confirmCancel() {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+
 }
 table {
   width: 100%;
@@ -126,5 +133,14 @@ td {
 .actions {
   display: flex;
   gap: 0.5rem;
+}
+.table-wrap {
+  overflow-x: auto;
+}
+.nowrap {
+  white-space: nowrap;
+}
+.muted {
+  color: #5d6a63;
 }
 </style>

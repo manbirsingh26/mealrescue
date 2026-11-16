@@ -97,8 +97,8 @@ onMounted(load)
 
   <template v-else>
     <p v-if="accounts.length === 0">No accounts are waiting for verification.</p>
-
-    <table v-else>
+<div v-else class="table-wrap">
+    <table >
       <thead>
         <tr>
           <th>Name</th>
@@ -118,23 +118,27 @@ onMounted(load)
             <td>{{ a.email }}</td>
             <td>{{ a.address }}</td>
             <td>{{ a.businessType }}</td>
-            <td>{{ formatDate(a.createdAt) }}</td>
-            <td class="actions">
+            <td class="nowrap">{{ formatDate(a.createdAt) }}</td>
+            <td >
+            <div class="actions">
               <button class="btn" :disabled="busy" @click="approve(a)">Approve</button>
               <button class="btn reject" :disabled="busy" @click="startReject(a)">Reject</button>
+            </div>
             </td>
           </tr>
           <tr v-if="rejectingId === a.id">
-            <td colspan="7" class="reject-row">
+            <td colspan="7" >
+              <div class="reject-row">
               <input v-model="reason" placeholder="Reason for rejection" maxlength="500" />
               <button class="btn reject" :disabled="busy" @click="confirmReject(a)">Confirm reject</button>
               <button class="btn cancel" :disabled="busy" @click="cancelReject">Cancel</button>
+             </div>
             </td>
           </tr>
         </template>
       </tbody>
     </table>
-
+</div>
     <button class="btn refresh" :disabled="loading" @click="load">Refresh</button>
   </template>
 </template>
@@ -143,15 +147,19 @@ onMounted(load)
 .intro {
   color: #5d6a63;
 }
+.table-wrap {
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}
 table {
   width: 100%;
   border-collapse: collapse;
   background: #fff;
-  margin-bottom: 1rem;
-}
+ }
 th,
 td {
   text-align: left;
+  vertical-align:middle;
   padding: 0.6rem 0.75rem;
   border-bottom: 1px solid #d9dfda;
 }
@@ -169,6 +177,8 @@ td {
   display: flex;
   gap: 0.5rem;
   align-items: center;
+}
+td:has(.reject-row) {
   background: #f6f7f4;
 }
 .reject-row input {
@@ -177,5 +187,8 @@ td {
   border: 1px solid #d9dfda;
   border-radius: 8px;
   font: inherit;
+}
+.nowrap {
+  white-space: nowrap;
 }
 </style>

@@ -143,7 +143,7 @@ async function reactivate(u) {
             <td>{{ u.email }}</td>
             <td>{{ formatStatus(u.role) }}</td>
             <td><StatusBadge :status="u.status" /></td>
-            <td>{{ formatDateTime(u.createdAt) }}</td>
+            <td class="nowrap">{{ formatDateTime(u.createdAt) }}</td>
             <td>
               <button
                 v-if="u.status === 'ACTIVE' && u.role !== 'ADMIN'"
@@ -213,5 +213,8 @@ td {
   vertical-align: middle;
   padding: 0.6rem 0.75rem;
   border-bottom: 1px solid #d9dfda;
+}
+.nowrap {
+  white-space: nowrap;
 }
 </style>

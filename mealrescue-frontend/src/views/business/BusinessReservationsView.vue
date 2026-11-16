@@ -129,7 +129,7 @@ async function submitCode() {
             </td>
             <td>{{ r.quantity }}</td>
             <td>{{ formatPrice(r.totalPrice) }}</td>
-            <td>{{ formatDateTime(r.pickupStart) }} to {{ formatDateTime(r.pickupEnd) }}</td>
+            <td class="nowrap">{{ formatDateTime(r.pickupStart) }},<br /> <span class="muted">to {{ formatDateTime(r.pickupEnd) }}</span></td>
             <td><StatusBadge :status="r.status" /></td>
             <td>{{ formatDateTime(r.createdAt) }}</td>
           </tr>
@@ -166,6 +166,9 @@ async function submitCode() {
   justify-content: space-between;
   gap: 1rem;
   flex-wrap: wrap;
+}
+.nowrap {
+  white-space: nowrap;
 }
 .muted {
   color: #5d6a63;
