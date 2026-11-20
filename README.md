@@ -4,7 +4,7 @@ MealRescue is a web platform that connects local businesses that have surplus fo
 
 The project was built for **CSIS 3175 Software Engineering** at Douglas College (Fall 2026).
 
-- **Team:** Manbir and Mani Singh
+- **Team:** Manbir Singh and Mani Singh
 - **Instructor:** Zhe Yang
 
 ---
